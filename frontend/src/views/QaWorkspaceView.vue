@@ -6,7 +6,7 @@ import { get, getEnvelope, patch, post, postStream } from '@/api/client'
 import StatusTag from '@/components/StatusTag.vue'
 import type { QaCitationItem, QaMessageItem, QaSessionItem } from '@/types'
 import { errorMessage, shortTime } from '@/utils/display'
-import { applyQaStreamEvent, inlineQaCitations } from '@/utils/qa'
+import { applyQaStreamEvent, inlineQaCitations, qaCitationErrorMessage } from '@/utils/qa'
 
 const loadingSessions = ref(false)
 const loadingMessages = ref(false)
@@ -207,7 +207,7 @@ async function openCitations(message: QaMessageItem): Promise<void> {
       activeCitations.value = await get<QaCitationItem[]>(`/api/v1/qa/messages/${message.id}/citations`)
     }
   } catch (error) {
-    ElMessage.warning(errorMessage(error))
+    ElMessage.warning(qaCitationErrorMessage(error))
   } finally {
     citationLoading.value = false
   }

@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
+import { ApiError } from '@/api/client'
 import type { QaCitationItem, QaMessageItem } from '@/types'
 
-import { applyQaStreamEvent, extractQaDeltaContent, inlineQaCitations } from './qa'
+import { applyQaStreamEvent, extractQaDeltaContent, inlineQaCitations, qaCitationErrorMessage } from './qa'
 
 function answerMessage(): QaMessageItem {
   return {
@@ -51,5 +52,10 @@ describe('qa helpers', () => {
     const citations: QaCitationItem[] = [{ knowledge_item_id: 'item-1', rank: 1, excerpt: '引用' }]
     expect(inlineQaCitations({ ...answerMessage(), citations })).toEqual(citations)
     expect(inlineQaCitations(answerMessage())).toEqual([])
+  })
+
+  it('uses a clear citation message for missing citation records', () => {
+    expect(qaCitationErrorMessage(new ApiError(404, 'NOT_FOUND', '引用不存在'))).toBe('当前回答没有可查看的引用，或引用记录已不可访问')
+    expect(qaCitationErrorMessage(new Error('服务异常'))).toBe('服务异常')
   })
 })

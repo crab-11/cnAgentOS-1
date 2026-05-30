@@ -1,3 +1,4 @@
+import { ApiError } from '@/api/client'
 import type { QaCitationItem, QaMessageItem } from '@/types'
 
 export function extractQaDeltaContent(data: Record<string, unknown>): string {
@@ -26,4 +27,11 @@ export function applyQaStreamEvent(message: QaMessageItem, event: string, data: 
 
 export function inlineQaCitations(message: QaMessageItem): QaCitationItem[] {
   return message.citations?.length ? message.citations : []
+}
+
+export function qaCitationErrorMessage(error: unknown): string {
+  if (error instanceof ApiError && error.status === 404) {
+    return '当前回答没有可查看的引用，或引用记录已不可访问'
+  }
+  return error instanceof Error ? error.message : '引用加载失败，请稍后重试'
 }
